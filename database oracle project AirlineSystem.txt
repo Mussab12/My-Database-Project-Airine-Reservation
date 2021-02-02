@@ -1,0 +1,854 @@
+/////DCL STATEMENTS/////
+
+SYSTEM_LEVEL PRIVELEGES
+
+***GRANT*****
+conn sys as sysdba;
+
+Grant create view to AirlineReservation;
+grant create table to AirlineReservation;
+grant create session to AirlineReservation;
+grant create sequence to AirlineReservation;
+grant drop any table to AirlineReservation;
+
+
+****REVOKE*****
+
+conn sys as sysdba;
+revoke create table from AirlineReservation;
+revoke create session from AirlineReservation;
+conn AirlineReservation/abc;
+revoke select on Flight from accessor;
+revoke insert on Passenger from accessor;
+revoke update on Ticket from accessor;
+revoke alter on Ticket from accessor;
+revoke delete on Route from accessor;
+
+OBJECT_LEVEL PRIVELEGES
+
+conn sys as sysdba;
+create role accesser;
+grant create table to accesser;
+conn AirlineReservation/abc;
+grant accesser to AirlineReservation ;
+grant select,insert,update on Airline to accesser;
+grant select,insert,update on Flight to accesser;
+grant select,insert,update on Passenger to accesser;
+grant select,insert,update on Ticket to accesser;
+grant select,insert,update on Route to accesser;
+
+
+////DDL STATEMENTS/////
+
+
+******CREATING TABLES*******
+
+
+                              
+
+****Airline Table*******
+
+create table Airline( airline_id number(11) constraint al_id_pk primary key,
+                                airline_name varchar(50)  not null);
+
+
+****Flight Table******
+
+create table Flight( flight_id number(11) constraint FL_id_pk primary key,
+                               flight_shift varchar(50),
+                               airline_id number(11),
+                               route_id number(11),
+                               flight_name varchar(50),
+constraint AL_id_fk foreign key(airline_id)
+references  Airline(airline_id)); 
+                               
+
+******Route Table*****
+
+create table Route(route_id number(11) constraint r_id_pk primary key,
+                               route_departure varchar(50) not null,
+                               route_arrival varchar(50) not null,
+                               flight_id number(11),
+constraint fl_id_fk foreign key(flight_id)
+references Flight(flight_id));
+
+
+
+***Ticket Table********
+
+create table Ticket( ticket_id number(11),
+                              ticketfare_no number(11) not null,
+                              seat_no number(11) not null,
+                              ticket_category varchar(50),
+                              ticket_date varchar(50),
+                              flight_id number(11),
+constraint FL2_id_fk foreign key(flight_id)
+references Flight(flight_id)); 
+
+
+***Passenger Table******
+
+create table Passenger(passenger_id number(11) constraint ps_id_pk primary key,
+                                       passenger_name varchar(50) not null,
+                                       passenger_cnic number(14) not null,
+                                       passenger_phoneno number(14),
+                                       passenger_age number(3),
+                                       passenger_gender varchar(6),
+                                       passenger_state varchar(45),
+                                       passenger_passport number(20) not null,
+                                       flight_id number(11) not null,
+constraint FL3_id_fk foreign key(flight_id)
+references Flight(flight_id));
+
+*******ALTER*****
+
+alter table Ticket
+add constraint tk_id_pk primary key(ticket_id);
+
+alter table Ticket
+drop column passenger_id;
+
+alter table Ticket
+add passenger_id number(11) not null;
+
+alter table Ticket
+add constraint TK2_id_uk unique(passenger_id);
+
+alter table Ticket
+add constraint TK0_id_fk foreign key(passenger_id)
+references Passenger(passenger_id);
+
+
+
+*****Truncate Statement******
+
+truncate table Passenger; 
+
+*****Drop*****
+
+drop table Ticket;
+
+*****CREATING VIEWS******
+
+create view view_airline
+as select airline_name,airline_id
+from Airline;
+
+create view view_flight
+as select flight_id,flight_shift,airline_id,flight_name
+from Flight;
+
+create view view_route
+as select route_id,route_departure,route_arrival,flight_id
+from Route;
+
+create view view_ticket
+as select ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id
+from Ticket;
+
+create view view_passenger
+as select passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id
+from Passenger;
+
+
+/////DML Statements///
+
+
+******INSERT********
+
+******Inserting into Airline*****
+ 
+insert into Airline(airline_id,airline_name)
+values(1,'PIA');
+
+insert into AIrline(airline_id,airline_name)
+values(2,'AIR BLUE');
+
+insert into Airline(airline_id,airline_name)
+values(3,'TURKEY');
+
+insert into Airline(airline_id,airline_name)
+values(4,'SAUDI');
+
+insert into Airline(airline_id,airline_name)
+values(5,'SHAHEEN');
+
+insert into Airline(airline_id,airline_name)
+values(6,'ASKARI AVIATION');
+
+insert into Airline(airline_id,airline_name)
+values(7,'SERENE AIR');
+
+insert into Airline(airline_id,airline_name)
+values(8,'QATAR AIRWAYS');
+
+insert into Airline(airline_id,airline_name)
+values(9,'EMIRATES');
+
+insert into Airline(airline_id,airline_name)
+values(10,'SINGAPORE AIRLINES');
+
+insert into Airline(airline_id,airline_name)
+values(11,'GULF AIR');
+
+
+****INSERTING VALUES BY PROMPTING INTO AIRLINE TABLE*******
+
+insert into Airline(airline_id,airline_name)
+values(&airline_id,'&airline_name');
+
+insert into Airline(airline_id,airline_name)
+values(&airline_id,'&airline_name');
+
+insert into Airline(airline_id,airline_name)
+values(&airline_id,'&airline_name');
+
+insert into Airline(airline_id,airline_name)
+values(&airline_id,'&airline_name');
+
+insert into Airline(airline_id,airline_name)
+values(&airline_id,'&airline_name');
+
+*****Inserting into Flight********
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values (1,'Day',1,'Rawalpindi');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(2,'Night',1,'Karachi');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(3,'Night',1,'Karachi');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(4,'Day',2,'Spain');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(5,'Night',2,'Russia');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(6,'Night',3,'China');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(7,'Day',3,'USA');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(8,'Day',4,'Europe');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(9,'Night',4,'Libya');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(10,'Day',5,'Denmark');
+
+****INSERTING VALUES BY PROMPTING INTO FLIGHT TABLE*******
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(&flight_id,'&flight_shift',&airline_id,'&flight_name');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(&flight_id,'&flight_shift',&airline_id,'&flight_name');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(&flight_id,'&flight_shift',&airline_id,'&flight_name');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(&flight_id,'&flight_shift',&airline_id,'&flight_name');
+
+insert into Flight(flight_id,flight_shift,airline_id,flight_name)
+values(&flight_id,'&flight_shift',&airline_id,'&flight_name');                                      
+
+****Inserting into Route********
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(1,'ISLAMABAD','LAHORE',1);
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(2	,'ISLAMABAD','KARACHI',1);
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(3	,'SHARJA','USA',2);
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(4,'DUBAI','ISLAMABAD',2);
+
+///Inserting Multiple Records////
+
+insert all
+into Route(route_id,route_departure,route_arrival,flight_id)
+values(5,'LAHORE','SIALKOT',3)
+into Route(route_id,route_departure,route_arrival,flight_id)
+values(6,'DUBAI','LAHORE',3)
+into Route(route_id,route_departure,route_arrival,flight_id)
+values(7,'KARACHI','LAHORE',4)
+into Route(route_id,route_departure,route_arrival,flight_id)
+values(8,'KARACHI','MAKKAH',4)
+into Route(route_id,route_departure,route_arrival,flight_id)
+values(9,'KARACHI','MADINA',5)
+into Route(route_id,route_departure,route_arrival,flight_id)
+values(10,'MAKKAH','MADINA',5)
+select * from dual;
+
+****INSERTING VALUES BY PROMPTING INTO ROUTE TABLE*******
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(&route_id,'&route_departure','&route_arrival',&flight_id);
+
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(&route_id,'&route_departure','&route_arrival',&flight_id);
+
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(&route_id,'&route_departure','&route_arrival',&flight_id);
+
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(&route_id,'&route_departure','&route_arrival',&flight_id);
+
+
+insert into Route(route_id,route_departure,route_arrival,flight_id)
+values(&route_id,'&route_departure','&route_arrival',&flight_id);
+
+
+***Inserting into Ticket******
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (1,40000,1,'Bussiness Class','16/10/20',1,1);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (2,20000,24,'Economy Class','16/10/19',1,2);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (3,50000,100,'Bussiness Class','15/9/19',1,3);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (4,60000,100,'Bussiness Class','9/9/12',1,4);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (5,30000,10,'Economy Class','6/6/06',1,5);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (6,70000,9,'Bussiness Class','9/9/12',2,6);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (7,20000,100,'Economy Class','11/11/12',2,7);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (8,85000,'30','Bussiness Class','11/11/19',2,8);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (9,25000,40,'Economy Class','9/9/12',3,9);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values (10,90000,12,'Bussiness Class','5/1/01',4,10);
+
+***INSERTING INTO TICKET BY PROMPTING*****
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values(&ticket_id,&ticketfare_no,&seat_no,'&ticket_category','&ticket_date',&flight_id,&passenger_id);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values(&ticket_id,&ticketfare_no,&seat_no,'&ticket_category','&ticket_date',&flight_id,&passenger_id);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values(&ticket_id,&ticketfare_no,&seat_no,'&ticket_category','&ticket_date',&flight_id,&passenger_id);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values(&ticket_id,&ticketfare_no,&seat_no,'&ticket_category','&ticket_date',&flight_id,&passenger_id);
+
+insert into Ticket(ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,flight_id,passenger_id)
+values(&ticket_id,&ticketfare_no,&seat_no,'&ticket_category','&ticket_date',&flight_id,&passenger_id);
+
+
+***Inserting into Passenger******
+
+insert into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_state,passenger_passport,flight_id)
+ values(1,'Hassan',37405123678912,'PUNJAB',123456,1);
+
+
+insert into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+ values(2,'Ahmed',36890761256756,03009640725,20,'Male','Makkah',345678,1);
+
+
+insert into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+ values(3,'Ali',36890761256754,03009640724,40,'Male','Madina',145678,2);
+
+***Inserting multiple records at once***
+
+insert all
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+values(4,'Fatima Khan',31245678904567,35,'Female','Florida',678901,2)
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_passport,flight_id)
+values(5,'Ayesha Kiani',32367421789765,03145793600,35,'Female',576813,3)
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+values(6,'Ahmed Shah',30230897654390,453015350059,40,'Male','Miami',321460,3)
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+values(7,'Murtaza Pasha',30478012789045,3456123890,67,'Male','Russia',478912,4)
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+values(8,'Naeem',3047801278255,3956123890,55,'Male','Russia',978912,4)
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+values(9,'Hania',6047801278255,9956123890,45,'Female','China',878912,5)
+into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_phoneno,passenger_age,passenger_gender,passenger_state,passenger_passport,flight_id)
+values(10,'Amir Rajput',2047801278255,1956123890,45,'Male','China',778912,5)
+select * from dual;
+
+****INSERTING INTO PASSENGER BY PROMPTING***
+
+insert into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_state,passenger_passport,flight_id)
+ values(&passenger_id,'&passenger_name',&passenger_cnic,'&passenger_state',&passenger_passport,&flight_id);
+
+
+insert into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_state,passenger_passport,flight_id)
+ values(&passenger_id,'&passenger_name',&passenger_cnic,'&passenger_state',&passenger_passport,&flight_id);
+
+
+insert into Passenger(passenger_id,passenger_name,passenger_cnic,passenger_state,passenger_passport,flight_id)
+ values(&passenger_id,'&passenger_name',&passenger_cnic,'&passenger_state',&passenger_passport,&flight_id);
+
+****UPDATING********
+
+update Flight
+set flight_name='Ukraine'
+where flight_id=1;
+
+update Flight
+set flight_name='Romania'
+where flight_id=2;	
+
+update Flight
+set flight_name='Australia'
+where flight_id=3;
+
+update Flight
+set flight_name='France'
+where flight_id=4;
+
+update Passenger
+set passenger_cnic=45612323
+where passenger_name='Mussab';
+
+update Passenger
+set passenger_phoneno=92300872
+where passenger_name='Arsalan';
+
+update Passenger
+set passenger_cnic=4750123467
+where passenger_name='Arsalan';
+
+update Passenger
+set passenger_phoneno=234567891
+where passenger_name='Amjad Majid';
+
+update Passenger
+set passenger_cnic=374061234
+where passenger_name='Amjad Majid';
+
+
+****SELCTION*****
+
+select * from Flight;
+
+select * from Passenger;
+
+select passenger_name
+from Passenger
+where passenger_id=3;
+
+select ticket_category
+from Ticket
+where ticket_id=3;
+
+****DELETING*****
+
+delete from Airline where airline_name='PIA';
+
+delete from Passenger where passenger_id=1;
+
+delete from Flight where flight_name='Ukraine'; 
+
+
+/////Sql Statements///
+
+
+****Arithmetic Expressions******
+
+****Addition****
+select ticket_id,ticketfare_no,seat_no,ticket_category,ticket_date,(ticketfare_no+10000) as TAX from Ticket;
+
+****Multipication****
+
+select ticket_id,ticket_category,(ticketfare_no*ticketfare_no) as TAX from Ticket;
+
+****Subtraction****
+select ticket_id,ticket_category,(ticketfare_no-10000) as TAX from Ticket;
+
+****Division*******
+select ticket_id,ticketfare_no,seat_no,(ticketfare_no/2) as TAX from Ticket;
+
+
+****COLUMN ALIAS*****
+
+select flight_shift as SHIFT from Flight;
+
+****Use of column alias with double quotes****
+
+select passenger_state as "State of Passenger" from Passenger;
+
+****DISTINCT*****
+
+select distinct passenger_age from Passenger;
+
+****ORACLE Command******
+
+describe Passenger;
+
+
+****Where Clause****
+
+select flight_name 
+from Flight
+where flight_id=1;
+
+
+select airline_id
+from Airline
+where airline_name='AIR BLUE';
+
+select ticket_category
+from Ticket
+where ticket_id=3;
+
+
+*****Comparison Operators******
+
+select ticket_date
+from Ticket
+where ticketfare_no>40000;
+
+select flight_shift
+from Flight
+where flight_id>=4;
+
+select route_departure
+from Route
+where route_id<6;
+
+select route_arrival
+from Route
+where flight_id<=3;	
+
+select passenger_age
+from Passenger
+where passenger_id!=5
+
+***BETWEEN****
+
+select ticket_category
+from Ticket
+where ticket_id between 1 and 4;
+
+select passenger_cnic
+from Passenger
+where flight_id between 4 and 10;
+
+***IN OPERATOR****
+
+select passenger_state
+from Passenger
+where passenger_id in(2,6,10);
+
+select passenger_age
+from Passenger
+where flight_id in(1,3,4);
+
+
+****LIKE OPERATOR*****
+
+select flight_name from Flight where flight_name like 'U%'; /// To display the flight name whose first character is U///
+
+select passenger_name from Passenger where passenger_name like '_a%';//To display the passenger names where 'a' comes in second place////
+
+select passenger_name from Passenger where passenger_name like '__e%';//To display the passenger names where 'e' comes in third place///
+
+select passenger_name from Passenger where passenger_name like'%a';//To display the passenger names where last character is 'a'///
+
+select passenger_name from Passenger where passenger_name like'%e%';//To display the passenger names where e comes at any place////
+
+***IS NULL****
+
+select passenger_id,passenger_age from Passenger where passenger_state is null;
+
+****LOGICAL OPERATORS*****
+
+***AND****
+
+select ticket_category,ticket_date,seat_no,ticketfare_no
+from Ticket
+where seat_no=9 and ticketfare_no=70000;
+
+select flight_shift,flight_id,flight_name
+from Flight
+where flight_name like'_k%' and airline_id=1;
+
+*****OR*****
+
+select route_departure,route_arrival,route_id,flight_id
+from Route
+where route_id=1 or flight_id=5;
+
+select airline_name,airline_id
+from Airline
+where airline_id<10 or airline_name like'%A%';
+
+****NOT******
+
+select airline_name,airline_id
+from Airline
+where airline_id not in(1,3,5);
+
+select route_departure
+from Route
+where route_id not in(1,2,3,4,5,6);
+
+
+***ORDER BY CLAUSE ASCENDING ORDER***
+
+select passenger_name,passenger_id,passenger_age,passenger_gender
+from Passenger
+order by passenger_id;
+
+***ORDER BY CLAUSE DESCENDING ORDER****
+select passenger_name,passenger_id,passenger_age,passenger_gender
+from Passenger
+order by passenger_id desc;
+
+****ORDER by CLAUSE USING COLUMN ALIAS****
+
+select ticket_category,ticketfare_no*ticketfare_no ticketdouble
+from Ticket
+order by ticketdouble;
+
+****ORDER CLAUSE SORTING BY MULTIPLE COLUMNS****
+
+select ticket_category,ticketfare_no,seat_no
+from Ticket
+order by ticket_id,passenger_id;
+
+
+**SINGLE ROW FUNCTION****
+
+***Character Manipulation Function*****
+
+*****CONCAT*******
+
+select concat(passenger_name,passenger_id) from
+Passenger
+where passenger_id=1;
+
+****SUBSTR****
+select substr(passenger_name,1,4) as EXTRACTSTRING
+from Passenger
+where passenger_id=1;
+
+****LENGTH****
+select flight_name,length(flight_name)
+from Flight
+where flight_id=2;
+
+***INSTR***
+
+select instr(passenger_name,'i')
+from Passenger
+where passenger_id=1;
+
+****LPAD****
+
+select LPAD(passenger_name,20,'***')
+from Passenger;
+
+select RPAD(passenger_name,20,'***')
+from Passenger;
+
+****CASE CONVERSION FUNCTIONS*****
+
+select lower(airline_name)
+from Airline
+where airline_id=1;
+
+select upper(flight_name)
+from Flight
+where flight_id=3;
+
+select initcap(flight_name)
+from Flight
+where flight_id=4;
+
+****NUMBER FUNCTION******
+
+select mod(ticketfare_no,80000) from Ticket where ticket_id=2;
+
+****GROUP FUNCTIONS******
+
+select sum(ticketfare_no) as "TotalFare"
+from Ticket;
+
+select avg(ticketfare_no) as "AverageFare"
+from Ticket;
+
+select max(ticketfare_no) as "MaxFare"
+from Ticket;
+
+select min(ticketfare_no) as "MinFare"
+from Ticket;
+
+select count(passenger_name)
+from Passenger;
+
+***GROUP BY CLAUSE******
+
+select ticket_id,avg(ticketfare_no)
+from Ticket
+group by ticket_id;
+
+****GROUP BY WITH WHERE CLAUSE*****
+select ticket_id,avg(ticketfare_no)
+from Ticket
+where ticket_id=1
+group by ticket_id;
+
+****GROUP BY WITH ORDER BY CLAUSE*****
+select passenger_id,sum(ticketfare_no)
+from Ticket
+group by passenger_id
+order by passenger_id;
+
+select passenger_id,sum(ticketfare_no)
+from Ticket
+group by passenger_id
+order by passenger_id desc;
+
+*****GROUP BY WITH MORE THAN ONE COLUMN*****
+
+select ticket_id,passenger_id,avg(ticketfare_no)
+from Ticket
+group by ticket_id,passenger_id;
+
+
+****GROUP BY CLAUSE WITH HAVING CLAUSE******
+
+select ticket_id,sum(ticketfare_no)
+from Ticket
+group by ticket_id
+having sum(ticketfare_no)>40000;
+
+*****GROUP BY CLAUSE WITH HAVING AND ORDER BY CLAUSE*****
+select ticket_id,sum(ticketfare_no)
+from Ticket
+group by ticket_id
+having sum(ticketfare_no)>40000
+order by ticket_id;
+
+
+*****NESTING GROUP FUNCTIONS******
+select sum(max(ticketfare_no))
+from Ticket
+group by ticket_id;
+
+
+***SUBQUERY****
+
+select ticket_id,ticketfare_no
+from Ticket
+where ticketfare_no>
+(select ticketfare_no	
+from Ticket
+where ticket_id=2);
+
+
+****SUBQUERY WITTH ANY*****
+select ticket_id,ticketfare_no
+from Ticket
+where ticketfare_no> any
+(select ticketfare_no
+from Ticket
+where ticket_id=2);
+
+****SUBQUERY WITH ALL*****
+select ticket_id,ticketfare_no
+from Ticket
+where ticketfare_no> all
+(select ticketfare_no
+from Ticket
+where ticket_id=2);
+
+
+*****USING SUBQUERY WITH GROUP FUNCTION*****
+select ticket_category,ticketfare_no
+from Ticket
+where ticketfare_no=
+(select min(ticketfare_no)
+from Ticket);
+
+
+****USING SUBQUERY WITH HAVING CLAUSE*****
+
+select ticket_id,min(ticketfare_no)
+from Ticket
+group by ticket_id
+having min(ticketfare_no)>
+(select min(ticketfare_no)
+from Ticket
+where ticket_id=2);
+
+
+****INNER JOIN****
+select passenger_name from Passenger
+inner join Ticket on Passenger.passenger_id=Ticket.passenger_id
+where ticketfare_no<50000;
+
+select passenger_name from Passenger
+inner join Ticket on Passenger.passenger_id=Ticket.passenger_id
+where ticket_category='Bussiness Class';
+
+select p.passenger_id,p.passenger_name,t.passenger_id
+from Passenger p join Ticket t
+on(p.passenger_id=t.passenger_id);
+
+
+*****LEFT OUTER JOIN****
+
+select p.passenger_id,p.passenger_name,t.passenger_id
+from passenger p
+left outer join ticket t
+on(p.passenger_id=t.passenger_id);
+
+
+******RIGHT OUTER JOIN*****
+select p.passenger_name,p.passenger_id,t.passenger_id
+from Passenger p
+right outer join Ticket t
+on(p.passenger_id=t.passenger_id);
+
+****FULL OUTER JOIN****
+select p.passenger_name,p.passenger_id,t.ticket_id
+from Passenger p
+full outer join Ticket t
+on(p.passenger_id=t.ticket_id);
+
+
+****SELF JOIN*****
+select p.passenger_name pass,e.passenger_name emp
+from Passenger p join Passenger e
+on(p.passenger_id=e.flight_id);
+
+*****CROSS JOIN*****
+select passenger_name,ticket_category
+from Passenger
+cross join Ticket;
+
+
+
+
+
+
